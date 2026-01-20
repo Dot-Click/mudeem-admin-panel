@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "datatables.net-dt/js/dataTables.dataTables.js";
 import { SingleDefaultTooltipThree } from "../../child/DefaultTooltipThree";
 import moment from "moment";

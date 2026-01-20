@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import $ from "jquery";
 import "datatables.net-dt/js/dataTables.dataTables.js";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import Modal from "../extra/modal";
 import { VideoCard } from "../../../adminPages/contentCreator";
 import { SingleDefaultTooltipThree } from "../../child/DefaultTooltipThree";
 const ContentTable = ({

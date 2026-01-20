@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import $ from "jquery";
+// import $ from "jquery";
 import "datatables.net-dt/js/dataTables.dataTables.js";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
-import { SingleAvatarGroup } from "../../child/AvatarGroup";
-import { SquarePagination } from "../../PaginationLayer";
+// import { SingleAvatarGroup } from "../../child/AvatarGroup";
+// import { SquarePagination } from "../../PaginationLayer";
 import Modal from "../extra/modal";
 import Form from "./form";
 import DeleteModalContent from "../extra/deleteModalContent";

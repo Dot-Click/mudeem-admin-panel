@@ -1,6 +1,6 @@
 import React from "react";
-import TableDataLayer from "../../../TableDataLayer";
-import OrdersTable from "./table";
+// import TableDataLayer from "../../../TableDataLayer";
+// import OrdersTable from "./table";
 import OrderDetailTable from "./orderDetailTable";
 import moment from "moment";
 

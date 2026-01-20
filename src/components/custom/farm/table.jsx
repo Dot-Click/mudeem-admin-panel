@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Modal from "../extra/modal";
-import DeleteModalContent from "../extra/deleteModalContent";
+// import Modal from "../extra/modal";
+// import DeleteModalContent from "../extra/deleteModalContent";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import FarmDetail from "./farmDetails";
 import { z } from "zod";

@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React from "react";
 import Modal from "../extra/modal";
-import { SingleDefaultTooltipThree } from "../../child/DefaultTooltipThree";
+// import { SingleDefaultTooltipThree } from "../../child/DefaultTooltipThree";
 
 const InnovationDetail = ({ data, handleAcceptPost, handleRejectedPost }) => {
   return (

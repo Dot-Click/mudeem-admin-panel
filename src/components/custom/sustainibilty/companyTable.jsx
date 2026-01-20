@@ -1,5 +1,5 @@
 import React from "react";
-import $ from "jquery";
+// import $ from "jquery";
 import "datatables.net-dt/js/dataTables.dataTables.js";
 import { Icon } from "@iconify/react/dist/iconify.js";
 

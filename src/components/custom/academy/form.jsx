@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useEffect, useRef, useState } from "react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useCreateBook } from "../../../hook/apis/academy/useCreateBook";
 import { useUpdateBook } from "../../../hook/apis/academy/useUpdatedBook";
