@@ -12,36 +12,36 @@ import { useUpdateEvent } from "../hook/apis/events/useUpdateEvent";
 import moment from "moment";
 import { useDeletedEvent } from "../hook/apis/events/useDeleteEvent";
 
-const DatePicker = ({ id, placeholder, errors, register }) => {
-  const datePickerRef = useRef(null);
+// const DatePicker = ({ id, placeholder, errors, register }) => {
+//   const datePickerRef = useRef(null);
 
-  // console.log(register, typeof register);
+//   // console.log(register, typeof register);
 
-  useEffect(() => {
-    flatpickr(datePickerRef.current, {
-      enableTime: true,
-      dateFormat: "d/m/Y H:i",
-    });
-  }, []);
-  if (!register || typeof register !== "function") {
-    console.error("register is not a function", register);
-    return null; // Return null or show some fallback UI if register is undefined
-  }
-  // console.log(datePickerRef.current.value);
+//   useEffect(() => {
+//     flatpickr(datePickerRef.current, {
+//       enableTime: true,
+//       dateFormat: "d/m/Y H:i",
+//     });
+//   }, []);
+//   if (!register || typeof register !== "function") {
+//     console.error("register is not a function", register);
+//     return null; // Return null or show some fallback UI if register is undefined
+//   }
+//   // console.log(datePickerRef.current.value);
 
-  return (
-    <input
-      ref={datePickerRef}
-      id={id}
-      type="text"
-      className="form-control radius-8 bg-base"
-      placeholder={placeholder}
-      data-error={errors?.[id] ? "true" : "false"}
-      onChange={(e) => console.log(datePickerRef.current.value)}
-      // {...register(id)} // Use dynamic 'id' from props instead of hardcoding 'dateTime'
-    />
-  );
-};
+//   return (
+//     <input
+//       ref={datePickerRef}
+//       id={id}
+//       type="text"
+//       className="form-control radius-8 bg-base"
+//       placeholder={placeholder}
+//       data-error={errors?.[id] ? "true" : "false"}
+//       onChange={(e) => console.log(datePickerRef.current.value)}
+//       // {...register(id)} // Use dynamic 'id' from props instead of hardcoding 'dateTime'
+//     />
+//   );
+// };
 
 const EventSchema = z.object({
   name: z.string().min(3, "Invalid Event Title"),

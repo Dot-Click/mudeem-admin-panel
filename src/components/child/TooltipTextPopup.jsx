@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Tooltip } from "bootstrap/dist/js/bootstrap.bundle.min.js";
-import InputCustomStyles from "./InputCustomStyles";
+// import InputCustomStyles from "./InputCustomStyles";
 
 const TooltipTextPopup = () => {
   useEffect(() => {

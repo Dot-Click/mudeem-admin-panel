@@ -18,7 +18,7 @@ const ForgotPasswordLayer = () => {
   const {
     register,
     handleSubmit,
-    reset,
+    // reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(ForgotPasswordSchema),

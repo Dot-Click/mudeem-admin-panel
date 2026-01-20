@@ -1,5 +1,5 @@
 import React from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
+// import { Icon } from "@iconify/react/dist/iconify.js";
 import useGetNotifications from "../../hook/apis/Notifications/useGetNotifications"; // Import the hook
 
 const TopCustomersOne = () => {

@@ -1,8 +1,8 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React from "react";
 import { Link } from "react-router-dom";
-import Modal from "../custom/extra/modal";
-import PostModalBody from "../custom/collaborationForums/postModalBody";
+// import Modal from "../custom/extra/modal";
+// import PostModalBody from "../custom/collaborationForums/postModalBody";
 
 const HorizontalCard = () => {
   return (

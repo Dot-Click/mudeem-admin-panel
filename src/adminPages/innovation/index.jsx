@@ -16,7 +16,7 @@ const RewardSchema = z.object({
 });
 
 const Innovation = () => {
-  const [filter, setFilter] = useState({
+const [filter, setFilter] = useState({
     page: 0,
     limit: 100,
   });
