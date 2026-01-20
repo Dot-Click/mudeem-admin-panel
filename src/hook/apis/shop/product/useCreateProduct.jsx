@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import custAxios, { formAxios } from "../../../../config/axios.config";
+import  { formAxios } from "../../../../config/axios.config";
 import { toast } from "sonner";
 
 export const useCreateProduct = () => {
