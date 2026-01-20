@@ -16,7 +16,7 @@ const RewardSchema = z.object({
 });
 
 const Innovation = () => {
-const [filter, setFilter] = useState({
+  const [filter, setFilter] = useState({
     page: 0,
     limit: 100,
   });
@@ -40,35 +40,29 @@ const [filter, setFilter] = useState({
 
   const handleRejectedPost = async (id) => {
     try {
-      const payload = {
-        status: "rejected",
-      };
-      const res = await changeStatus({ payload: payload, id: id });
-      if (res) {
-        toast.success("Post rejected succssfully");
-      }
+      const payload = { status: "rejected" };
+      await changeStatus({ payload, id });
+      toast.success("Post rejected successfully");
     } catch (err) {
-      toast.success(err || "Post rejected failed");
+      toast.error(err || "Post rejection failed");
     }
   };
 
   const handleRewardPost = async (data) => {
     try {
-      const payload = {
-        status: "accepted",
-        points: data?.points,
-      };
-      const res = await changeStatus({ payload: payload, id: formId });
+      const payload = { status: "accepted", points: data?.points };
+      await changeStatus({ payload, id: formId });
       reset();
-      toast.success("Post accepted succssfully");
+      toast.success("Post accepted successfully");
     } catch (err) {
-      toast.success(err || "Post accepted failed");
+      toast.error(err || "Post acceptance failed");
     }
   };
 
-  const handlePagination = (number) => {
-    setFilter((prev) => ({ ...prev, page: number }));
-  };
+
+  // const handlePagination = (number) => {
+  //   setFilter((prev) => ({ ...prev, page: number }));
+  // };
   return (
     <div>
       <MasterLayout>

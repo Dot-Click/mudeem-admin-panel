@@ -53,12 +53,11 @@ const ViewProfileLayer = () => {
       phone: me?.user?.phone,
     },
   });
-
   useEffect(() => {
     setValue("name", me?.user?.name);
     setValue("email", me?.user?.email);
     setValue("phone", me?.user?.phone);
-  }, [me?.user]);
+  }, [me?.user, setValue]); // ✅ add setValue here
 
   useEffect(() => {
     if (me?.user?.profilePicture) {
@@ -363,9 +362,8 @@ const ViewProfileLayer = () => {
                         {...register("currentPassword")}
                       />
                       <span
-                        className={`toggle-password ${
-                          passwordVisible ? "ri-eye-off-line" : "ri-eye-line"
-                        } cursor-pointer position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light`}
+                        className={`toggle-password ${passwordVisible ? "ri-eye-off-line" : "ri-eye-line"
+                          } cursor-pointer position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light`}
                         onClick={togglePasswordVisibility}
                       ></span>
                     </div>
@@ -393,11 +391,10 @@ const ViewProfileLayer = () => {
                         {...register("newPassword")}
                       />
                       <span
-                        className={`toggle-password ${
-                          confirmPasswordVisible
-                            ? "ri-eye-off-line"
-                            : "ri-eye-line"
-                        } cursor-pointer position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light`}
+                        className={`toggle-password ${confirmPasswordVisible
+                          ? "ri-eye-off-line"
+                          : "ri-eye-line"
+                          } cursor-pointer position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light`}
                         onClick={toggleConfirmPasswordVisibility}
                       ></span>
                     </div>

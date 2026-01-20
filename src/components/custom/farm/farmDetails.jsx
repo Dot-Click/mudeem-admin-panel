@@ -13,7 +13,11 @@ const FarmDetail = ({ data }) => {
                 imageClass="klkl"
               />
             ) : (
-              <img src={data?.images[0]} className="post-detail-image" />
+              <img
+                src={mainImage}
+                className="post-detail-image"
+                alt={data?.location ? `Farm at ${data.location}` : "Farm image"}
+              />
             )}
           </div>
         </div>

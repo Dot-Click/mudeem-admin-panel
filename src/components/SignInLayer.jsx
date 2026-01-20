@@ -10,7 +10,7 @@ import Loader from "./custom/extra/loader";
 const LoginSchema = z.object({
   email: z
     .string()
-    .regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid email address"),
+    .regex(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -28,9 +28,9 @@ const SignInLayer = () => {
 
   const handleFormSubmit = async (data) => {
     try {
-     const res = await login(data);
-     console.log(res);
-     
+      const res = await login(data);
+      console.log(res);
+
       navigate("/dashboard");
     } catch (err) {
       console.error("Login failed:", err);

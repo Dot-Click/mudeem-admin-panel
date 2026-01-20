@@ -108,13 +108,15 @@ const BannerForm = ({ data }) => {
     };
   }, [imagePreview]);
 
+
   useEffect(() => {
     if (data?.name || data?.image) {
       setValue("name", data.name);
       setImagePreview(data.image);
       setImageFile(data.image);
     }
-  }, [data]);
+  }, [data, setValue]);
+
 
   return (
     <form

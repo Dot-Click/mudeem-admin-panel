@@ -11,7 +11,7 @@ import Loader from "./custom/extra/loader";
 const ForgotPasswordSchema = z.object({
   email: z
     .string()
-    .regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid email address"),
+    .regex(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid email address"),
 });
 const ForgotPasswordLayer = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const ForgotPasswordLayer = () => {
   } = useForm({
     resolver: zodResolver(ForgotPasswordSchema),
   });
-  const { forgotPassword, isPending } = useForgotPassword();
+  const { isPending } = useForgotPassword();
   const handleFormSubmit = async (data) => {
     if (data?.email) {
       try {
@@ -75,8 +75,8 @@ const ForgotPasswordLayer = () => {
               <button
                 type="submit"
                 className="btn btn-success text-sm btn-sm px-12 py-16 w-100 radius-12 mt-32"
-                // data-bs-toggle="modal"
-                // data-bs-target="#exampleModal"
+              // data-bs-toggle="modal"
+              // data-bs-target="#exampleModal"
               >
                 {isPending ? <Loader loading={isPending} /> : "Continue"}
               </button>

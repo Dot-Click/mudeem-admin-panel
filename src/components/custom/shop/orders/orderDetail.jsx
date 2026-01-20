@@ -12,7 +12,12 @@ const OrderDetail = ({ rows }) => {
       <div className="my-20">
         <div className="w-50">
           <div className="d-flex gap-2 align-items-center">
-            <img src="/assets/images/user.png" width={40} />
+            {/* <img src="/assets/images/user.png" width={40} /> */}
+            <img
+              src="/assets/images/user.png"
+              alt="User avatar"
+              width={40}
+            />
             <div>
               <p className="mb-0">{rows?.address?.name || "-"}</p>
               <p className="mb-0 text-sm">{rows?.user?.email || "-"}</p>

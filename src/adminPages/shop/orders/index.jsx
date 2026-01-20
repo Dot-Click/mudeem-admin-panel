@@ -10,10 +10,10 @@ const Order = () => {
   const [filters, setFilters] = useState({ search: "" });
   const { orders, isPending } = useGetOrder(filters);
 
-  const handleSearch = (value) => {
-    setFilters((prev) => ({ ...prev, search: value }));
-  };
-  
+  // const handleSearch = (value) => {
+  //   setFilters((prev) => ({ ...prev, search: value }));
+  // };
+
   console.log(orders, orders?.length > 0);
 
   return (

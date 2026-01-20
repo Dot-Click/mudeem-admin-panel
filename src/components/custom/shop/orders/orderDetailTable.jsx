@@ -41,6 +41,7 @@ const OrderDetailTable = ({ isSelectable, rows }) => {
               <div className="d-flex gap-1 align-items-center ">
                 <img
                   src={item?.product?.images[0] || "/assets/images/product.png"}
+                  alt={item?.product?.name || "Product image"}
                   width={40}
                 />
                 {item?.product?.name?.length > 15 ? (

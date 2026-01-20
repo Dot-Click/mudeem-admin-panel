@@ -8,187 +8,112 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Loader from "../components/custom/extra/loader";
 
-// Define the validation schema using Zod
+// Validation schema
 const SettingSchema = z.object({
   websiteName: z.string().min(1, "Website name is required"),
   websiteDescription: z.string().min(1, "Website description is required"),
-  carPoolingGreenPoints: z
-    .number()
-    .min(0, "Green points must be a positive number"),
-  greenMapGreenPoints: z
-    .number()
-    .min(0, "Green points must be a positive number"),
-  gptMessageGreenPoints: z
-    .number()
-    .min(0, "Green points must be a positive number"),
+  carPoolingGreenPoints: z.number().min(0, "Green points must be a positive number"),
+  greenMapGreenPoints: z.number().min(0, "Green points must be a positive number"),
+  gptMessageGreenPoints: z.number().min(0, "Green points must be a positive number"),
 });
 
 const CompanyLayer = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [logoPreview, setLogoPreview] = useState({
-    file: null,
-    src: "",
-    error: "",
-  });
-  const [faviconPreview, setFaviconPreview] = useState({
-    file: null,
-    src: "",
-    error: "",
-  });
+  const [logoPreview, setLogoPreview] = useState({ file: null, src: "", error: "" });
+  const [faviconPreview, setFaviconPreview] = useState({ file: null, src: "", error: "" });
 
   const logoInputRef = useRef(null);
   const faviconInputRef = useRef(null);
+
   const { createSetting } = useCreateSetting();
   const { updateSetting } = useUpdateSetting();
-  const { settings, isLoading, isError, error } = useGetSettings();
+  const { settings } = useGetSettings();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(SettingSchema),
   });
 
+  // Initialize form values and image previews safely
   useEffect(() => {
-    if (settings) {
-      setValue("websiteName", settings.websiteName);
-      setValue("websiteDescription", settings.websiteDescription);
-      setValue("carPoolingGreenPoints", settings.carPoolingGreenPoints);
-      setValue("greenMapGreenPoints", settings.greenMapGreenPoints);
-      setValue("gptMessageGreenPoints", settings.gptMessageGreenPoints);
+    if (!settings) return;
 
-      if (settings.logo) {
-        setLogoPreview({
-          ...logoPreview,
-          src: settings.logo,
-          file: settings.logo,
-        });
-      }
+    setValue("websiteName", settings.websiteName);
+    setValue("websiteDescription", settings.websiteDescription);
+    setValue("carPoolingGreenPoints", settings.carPoolingGreenPoints);
+    setValue("greenMapGreenPoints", settings.greenMapGreenPoints);
+    setValue("gptMessageGreenPoints", settings.gptMessageGreenPoints);
 
-      if (settings.favIcon) {
-        setFaviconPreview({
-          ...faviconPreview,
-          src: settings.favIcon,
-          file: settings.favIcon,
-        });
-      }
-    }
+    setLogoPreview(prev => ({
+      ...prev,
+      src: settings.logo || "",
+      file: settings.logo || null,
+    }));
+
+    setFaviconPreview(prev => ({
+      ...prev,
+      src: settings.favIcon || "",
+      file: settings.favIcon || null,
+    }));
   }, [settings, setValue]);
 
+  // Handle logo and favicon file selection
   const handleFileChange = (e, type) => {
-    if (e.target.files.length > 0) {
-      const file = e.target.files[0];
+    if (!e.target.files || e.target.files.length === 0) return;
 
-      // Check if file is an image
-      if (!file.type.startsWith("image/")) {
-        if (type === "logo") {
-          setLogoPreview({
-            ...logoPreview,
-            error: "Please upload a valid image file.",
-          });
-        } else if (type === "favicon") {
-          setFaviconPreview({
-            ...faviconPreview,
-            error: "Please upload a valid image file.",
-          });
-        }
-        return;
-      }
-
-      // Check if file size exceeds limit
-      if (file.size > 2 * 1024 * 1024) {
-        // 2MB limit
-        if (type === "logo") {
-          setLogoPreview({
-            ...logoPreview,
-            error: "File size must be less than 2MB",
-          });
-        } else if (type === "favicon") {
-          setFaviconPreview({
-            ...faviconPreview,
-            error: "File size must be less than 2MB",
-          });
-        }
-        return;
-      }
-
-      const src = URL.createObjectURL(file);
-
-      if (type === "logo") {
-        setLogoPreview({
-          ...logoPreview,
-          file: file,
-          src: src,
-          error: "",
-        });
-      } else if (type === "favicon") {
-        setFaviconPreview({
-          ...faviconPreview,
-          file: file,
-          src: src,
-          error: "",
-        });
-      }
+    const file = e.target.files[0];
+    if (!file.type.startsWith("image/")) {
+      type === "logo"
+        ? setLogoPreview(prev => ({ ...prev, error: "Please upload a valid image file." }))
+        : setFaviconPreview(prev => ({ ...prev, error: "Please upload a valid image file." }));
+      return;
     }
+
+    if (file.size > 2 * 1024 * 1024) {
+      type === "logo"
+        ? setLogoPreview(prev => ({ ...prev, error: "File size must be less than 2MB" }))
+        : setFaviconPreview(prev => ({ ...prev, error: "File size must be less than 2MB" }));
+      return;
+    }
+
+    const src = URL.createObjectURL(file);
+    type === "logo"
+      ? setLogoPreview({ file, src, error: "" })
+      : setFaviconPreview({ file, src, error: "" });
   };
 
+  // Remove selected image
   const removeImage = (type) => {
-    if (type === "logo") {
-      setLogoPreview({
-        file: null,
-        src: "",
-        error: "",
-      });
-      if (logoInputRef.current) {
-        logoInputRef.current.value = "";
-      }
-    } else {
-      setFaviconPreview({
-        file: null,
-        src: "",
-        error: "",
-      });
-      if (faviconInputRef.current) {
-        faviconInputRef.current.value = "";
-      }
-    }
+    type === "logo"
+      ? setLogoPreview({ file: null, src: "", error: "" })
+      : setFaviconPreview({ file: null, src: "", error: "" });
+
+    if (type === "logo" && logoInputRef.current) logoInputRef.current.value = "";
+    if (type === "favicon" && faviconInputRef.current) faviconInputRef.current.value = "";
   };
 
+  // Form submission
   const onSubmit = async (formData) => {
-    setIsSubmitting(true); // Start loading
+    setIsSubmitting(true);
 
     try {
-      const settingData = new FormData();
-      settingData.append("websiteName", formData.websiteName);
-      settingData.append("websiteDescription", formData.websiteDescription);
-      settingData.append(
-        "carPoolingGreenPoints",
-        formData.carPoolingGreenPoints
-      );
-      settingData.append("greenMapGreenPoints", formData.greenMapGreenPoints);
-      settingData.append(
-        "gptMessageGreenPoints",
-        formData.gptMessageGreenPoints
-      );
+      const formPayload = new FormData();
+      formPayload.append("websiteName", formData.websiteName);
+      formPayload.append("websiteDescription", formData.websiteDescription);
+      formPayload.append("carPoolingGreenPoints", formData.carPoolingGreenPoints);
+      formPayload.append("greenMapGreenPoints", formData.greenMapGreenPoints);
+      formPayload.append("gptMessageGreenPoints", formData.gptMessageGreenPoints);
 
-      if (typeof(logoPreview?.file) !== "string") settingData.append("logo", logoPreview.file);
-      else if (typeof(logoPreview?.src) !== "string") settingData.append("logo", logoPreview.src);
-      // else settingData.append("logo", settings?.logo || "");
-
-      if (typeof(faviconPreview?.file) !== "string")
-        settingData.append("favIcon", faviconPreview.file);
-      else if (typeof(faviconPreview?.src) !== "string")
-        settingData.append("favIcon", faviconPreview.src);
-      // else settingData.append("favIcon", settings?.favIcon || "");
+      if (logoPreview.file && typeof logoPreview.file !== "string") formPayload.append("logo", logoPreview.file);
+      if (faviconPreview.file && typeof faviconPreview.file !== "string") formPayload.append("favIcon", faviconPreview.file);
 
       let res;
       if (settings?._id) {
-        res = await updateSetting({payload:settingData, type: typeof(faviconPreview?.file) !== "string" || typeof(logoPreview?.file) !== "string" ? "form" : "json"});
+        res = await updateSetting({
+          payload: formPayload,
+          type: (logoPreview.file || faviconPreview.file) ? "form" : "json",
+        });
       } else {
-        res = await createSetting(settingData);
+        res = await createSetting(formPayload);
       }
 
       if (res) {
@@ -199,7 +124,7 @@ const CompanyLayer = () => {
     } catch (err) {
       console.error("Setting update failed:", err);
     } finally {
-      setIsSubmitting(false); // Stop loading
+      setIsSubmitting(false);
     }
   };
 
@@ -208,186 +133,86 @@ const CompanyLayer = () => {
       <div className="card-body p-20 p-lg-40">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="row">
-            {/* Logo Upload Section */}
+            {/* Logo */}
             <div className="col-6">
               <label>Upload Logo</label>
               <div className="upload-image-wrapper d-flex align-items-center gap-3">
-                {logoPreview?.src ? (
+                {logoPreview.src ? (
                   <div className="uploaded-img position-relative h-120-px w-120-px border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50">
-                    <button
-                      type="button"
-                      onClick={() => removeImage("logo")}
-                      className="uploaded-img__remove position-absolute top-0 end-0 z-1 text-2xxl line-height-1 me-8 mt-8 d-flex"
-                      aria-label="Remove uploaded image"
-                    >
-                      <Icon
-                        icon="radix-icons:cross-2"
-                        className="text-xl text-danger-600"
-                      ></Icon>
+                    <button type="button" onClick={() => removeImage("logo")} aria-label="Remove uploaded image" className="uploaded-img__remove position-absolute top-0 end-0 z-1 text-2xxl line-height-1 me-8 mt-8 d-flex">
+                      <Icon icon="radix-icons:cross-2" className="text-xl text-danger-600" />
                     </button>
-                    <img
-                      id="uploaded-img__preview"
-                      className="w-100 h-100 object-fit-cover"
-                      src={logoPreview?.src}
-                      alt="Preview"
-                    />
+                    <img src={logoPreview.src} alt="Logo Preview" className="w-100 h-100 object-fit-cover" />
                   </div>
                 ) : (
-                  <label
-                    className="upload-file h-120-px w-120-px border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50 bg-hover-neutral-200 d-flex align-items-center flex-column justify-content-center gap-1"
-                    htmlFor="logo-file"
-                  >
-                    <Icon
-                      icon="solar:camera-outline"
-                      className="text-xl text-secondary-light"
-                    ></Icon>
-                    <span className="fw-semibold text-secondary-light">
-                      Upload
-                    </span>
+                  <label htmlFor="logo-file" className="upload-file h-120-px w-120-px border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50 bg-hover-neutral-200 d-flex align-items-center flex-column justify-content-center gap-1">
+                    <Icon icon="solar:camera-outline" className="text-xl text-secondary-light" />
+                    <span className="fw-semibold text-secondary-light">Upload</span>
                   </label>
                 )}
-                <input
-                  id="logo-file"
-                  type="file"
-                  onChange={(e) => handleFileChange(e, "logo")}
-                  hidden
-                  ref={logoInputRef}
-                  accept="image/*"
-                />
+                <input id="logo-file" type="file" hidden ref={logoInputRef} accept="image/*" onChange={(e) => handleFileChange(e, "logo")} />
               </div>
-              {logoPreview?.error && (
-                <p className="text-danger-500">{logoPreview?.error}</p>
-              )}
+              {logoPreview.error && <p className="text-danger-500">{logoPreview.error}</p>}
             </div>
 
-            {/* Favicon Upload Section */}
+            {/* Favicon */}
             <div className="col-6">
               <label>Upload Favicon</label>
               <div className="upload-image-wrapper d-flex align-items-center gap-3">
-                {faviconPreview?.src ? (
+                {faviconPreview.src ? (
                   <div className="uploaded-img position-relative h-120-px w-120-px border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50">
-                    <button
-                      type="button"
-                      onClick={() => removeImage("favicon")}
-                      className="uploaded-img__remove position-absolute top-0 end-0 z-1 text-2xxl line-height-1 me-8 mt-8 d-flex"
-                      aria-label="Remove uploaded image"
-                    >
-                      <Icon
-                        icon="radix-icons:cross-2"
-                        className="text-xl text-danger-600"
-                      ></Icon>
+                    <button type="button" onClick={() => removeImage("favicon")} aria-label="Remove uploaded image" className="uploaded-img__remove position-absolute top-0 end-0 z-1 text-2xxl line-height-1 me-8 mt-8 d-flex">
+                      <Icon icon="radix-icons:cross-2" className="text-xl text-danger-600" />
                     </button>
-                    <img
-                      id="uploaded-img__preview"
-                      className="w-100 h-100 object-fit-cover"
-                      src={faviconPreview?.src}
-                      alt="Preview"
-                    />
+                    <img src={faviconPreview.src} alt="Favicon Preview" className="w-100 h-100 object-fit-cover" />
                   </div>
                 ) : (
-                  <label
-                    className="upload-file h-120-px w-120-px border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50 bg-hover-neutral-200 d-flex align-items-center flex-column justify-content-center gap-1"
-                    htmlFor="favicon-file"
-                  >
-                    <Icon
-                      icon="solar:camera-outline"
-                      className="text-xl text-secondary-light"
-                    ></Icon>
-                    <span className="fw-semibold text-secondary-light">
-                      Upload
-                    </span>
+                  <label htmlFor="favicon-file" className="upload-file h-120-px w-120-px border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50 bg-hover-neutral-200 d-flex align-items-center flex-column justify-content-center gap-1">
+                    <Icon icon="solar:camera-outline" className="text-xl text-secondary-light" />
+                    <span className="fw-semibold text-secondary-light">Upload</span>
                   </label>
                 )}
-                <input
-                  id="favicon-file"
-                  type="file"
-                  onChange={(e) => handleFileChange(e, "favicon")}
-                  hidden
-                  ref={faviconInputRef}
-                  accept="image/*"
-                />
+                <input id="favicon-file" type="file" hidden ref={faviconInputRef} accept="image/*" onChange={(e) => handleFileChange(e, "favicon")} />
               </div>
-              {faviconPreview?.error && (
-                <p className="text-danger-500">{faviconPreview?.error}</p>
-              )}
+              {faviconPreview.error && <p className="text-danger-500">{faviconPreview.error}</p>}
             </div>
 
-            {/* Website Name Field */}
+            {/* Website Name */}
             <div className="col-12 mt-24">
               <label>Website Name</label>
-              <input
-                type="text"
-                className="form-control"
-                {...register("websiteName")}
-              />
-              {errors.websiteName && (
-                <p className="text-danger-500">{errors.websiteName.message}</p>
-              )}
+              <input type="text" className="form-control" {...register("websiteName")} />
+              {errors.websiteName && <p className="text-danger-500">{errors.websiteName.message}</p>}
             </div>
 
-            {/* Website Description Field */}
+            {/* Website Description */}
             <div className="col-12 mt-24">
               <label>Website Description</label>
-              <textarea
-                className="form-control"
-                {...register("websiteDescription")}
-              />
-              {errors.websiteDescription && (
-                <p className="text-danger-500">
-                  {errors.websiteDescription.message}
-                </p>
-              )}
+              <textarea className="form-control" {...register("websiteDescription")} />
+              {errors.websiteDescription && <p className="text-danger-500">{errors.websiteDescription.message}</p>}
             </div>
 
-            {/* Green Points Fields */}
+            {/* Green Points */}
             <div className="col-6 mt-24">
               <label>Car Pooling Green Points</label>
-              <input
-                type="number"
-                className="form-control"
-                {...register("carPoolingGreenPoints", { valueAsNumber: true })}
-              />
-              {errors.carPoolingGreenPoints && (
-                <p className="text-danger-500">
-                  {errors.carPoolingGreenPoints.message}
-                </p>
-              )}
+              <input type="number" className="form-control" {...register("carPoolingGreenPoints", { valueAsNumber: true })} />
+              {errors.carPoolingGreenPoints && <p className="text-danger-500">{errors.carPoolingGreenPoints.message}</p>}
             </div>
 
             <div className="col-6 mt-24">
               <label>Green Map Green Points</label>
-              <input
-                type="number"
-                className="form-control"
-                {...register("greenMapGreenPoints", { valueAsNumber: true })}
-              />
-              {errors.greenMapGreenPoints && (
-                <p className="text-danger-500">
-                  {errors.greenMapGreenPoints.message}
-                </p>
-              )}
+              <input type="number" className="form-control" {...register("greenMapGreenPoints", { valueAsNumber: true })} />
+              {errors.greenMapGreenPoints && <p className="text-danger-500">{errors.greenMapGreenPoints.message}</p>}
             </div>
 
             <div className="col-6 mt-24">
               <label>GPT Message Green Points</label>
-              <input
-                type="number"
-                className="form-control"
-                {...register("gptMessageGreenPoints", { valueAsNumber: true })}
-              />
-              {errors.gptMessageGreenPoints && (
-                <p className="text-danger-500">
-                  {errors.gptMessageGreenPoints.message}
-                </p>
-              )}
+              <input type="number" className="form-control" {...register("gptMessageGreenPoints", { valueAsNumber: true })} />
+              {errors.gptMessageGreenPoints && <p className="text-danger-500">{errors.gptMessageGreenPoints.message}</p>}
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <div className="d-flex align-items-center justify-content-end gap-3 mt-24">
-              <button
-                type="submit"
-                className="btn btn-success-500 border border-success-600 text-md px-24 py-12 radius-8"
-              >
+              <button type="submit" className="btn btn-success-500 border border-success-600 text-md px-24 py-12 radius-8">
                 {isSubmitting ? <Loader /> : "Save Change"}
               </button>
             </div>

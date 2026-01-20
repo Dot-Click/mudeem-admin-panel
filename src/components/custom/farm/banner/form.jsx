@@ -109,18 +109,19 @@ const BannerForm = ({ data, closeModal }) => {
   useEffect(() => {
     return () => {
       if (imagePreview) {
-        URL.revokeObjectURL(imagePreview); // Clean up the object URL
+        URL.revokeObjectURL(imagePreview);
       }
     };
-  }, [imagePreview]);
+  }, [imagePreview]); // ✅ correct
 
   useEffect(() => {
     if (data?.name || data?.image) {
       setValue("name", data.name);
+      setValue("name_ar", data?.name_ar); // if needed
       setImagePreview(data.image);
       setImageFile(data.image);
     }
-  }, [data]);
+  }, [data, setValue]); // ✅ include setValue
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>

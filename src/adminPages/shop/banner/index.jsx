@@ -9,23 +9,23 @@ import Loader from "../../../components/custom/extra/loader";
 import DataNotFound from "../../../components/custom/extra/dataNotFound";
 
 const Banner = () => {
-  const tableRows = [
-    {
-      id: "453",
-      name: "Watch sale 50% off",
-      createdAt: "25-Feb-2025",
-    },
-    {
-      id: "453",
-      name: "Watch sale 50% off",
-      createdAt: "25-Feb-2025",
-    },
-    {
-      id: "453",
-      name: "Watch sale 50% off",
-      createdAt: "25-Feb-2025",
-    },
-  ];
+  // const tableRows = [
+  //   {
+  //     id: "453",
+  //     name: "Watch sale 50% off",
+  //     createdAt: "25-Feb-2025",
+  //   },
+  //   {
+  //     id: "453",
+  //     name: "Watch sale 50% off",
+  //     createdAt: "25-Feb-2025",
+  //   },
+  //   {
+  //     id: "453",
+  //     name: "Watch sale 50% off",
+  //     createdAt: "25-Feb-2025",
+  //   },
+  // ];
   const { banners, isPending } = useGetBanner();
   console.log(banners);
 

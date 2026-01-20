@@ -55,7 +55,8 @@ const Form = ({ data }) => {
       setValue("greenPointsPerTime", data?.greenPointsPerTime);
       setValue("category", data?.category);
     }
-  }, [data]);
+  }, [data, setValue]);
+
 
   const { createLocation, isPending } = useCreateLocation();
   const { updateLocation, updatePending } = useUpdateLocation();

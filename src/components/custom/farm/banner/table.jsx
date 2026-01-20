@@ -54,7 +54,12 @@ const BannerTable = ({ isSelectable, rows }) => {
             <td>{item?.name}</td>
             <td>
               {" "}
-              <img src={item?.image} width={100} />
+              {/* <img src={item?.image} width={100} /> */}
+              <img
+                src={item.image}
+                width={100}
+                alt={item?.name ? `Banner: ${item.name}` : "Banner image"}
+              />
             </td>
 
             <td> {moment(item?.createdAt).format("DD/MMM/YYYY")}</td>

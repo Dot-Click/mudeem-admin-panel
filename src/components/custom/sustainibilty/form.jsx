@@ -12,7 +12,8 @@ const CompanySchema = z.object({
   contact: z.number().min(3, "Invalid Contact Number"),
   email: z
     .string()
-    .regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid Contact Email"),
+    .regex(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid Contact Email"),
+    // .regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid Contact Email"),
   website: z.string().min(3, "Invalid Website Link"),
   description: z.string().min(3, "Invalid Description"),
 });
@@ -49,7 +50,8 @@ const Form = ({ data }) => {
       setValue("description", data?.description);
       setValue("location", data?.location);
     }
-  }, [data]);
+  }, [data, setValue]);
+  
 
   const handleFormSubmit = async (values) => {
     console.log(values);

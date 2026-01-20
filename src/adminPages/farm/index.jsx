@@ -8,7 +8,7 @@ import { useGetFarm } from "../../hook/apis/sustainableFarm/useGetFarm";
 import DataNotFound from "../../components/custom/extra/dataNotFound";
 
 const Farm = () => {
-  const [filter, setFilter] = useState({
+  const [filter] = useState({
     page: 0,
     limit: 9,
   });

@@ -35,9 +35,15 @@ const InnovationDetail = ({ data, handleAcceptPost, handleRejectedPost }) => {
                 key={i}
                 className="badge text-sm fw-semibold text-success-600 bg-success-100 px-20 py-9 radius-4 text-white"
               >
-                <a href={doc} target="_blank" download>
+                <a
+                  href={doc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                >
                   Document {doc?.split(".")[doc?.split(".")?.length - 1]}
                 </a>
+
               </span>
             );
           })

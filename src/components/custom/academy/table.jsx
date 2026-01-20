@@ -53,6 +53,7 @@ const AcademyTable = ({ isSelectable, rows }) => {
                 <img
                   className="table-row-image"
                   src={item?.thumbnail || "/assets/images/book.png"}
+                  alt={item?.title || "Book Thumbnail"} // ✅ add a descriptive alt
                   width={50}
                 />
                 {item?.isPremium && (

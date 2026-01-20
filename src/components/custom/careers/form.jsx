@@ -66,7 +66,8 @@ const CareerForm = ({ data }) => {
       setValue("linkedInUrl", data?.linkedInUrl);
       setValue("description", data?.description);
     }
-  }, [data]);
+  }, [data, setValue]); // ✅ add setValue here
+
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div className="row gy-3">

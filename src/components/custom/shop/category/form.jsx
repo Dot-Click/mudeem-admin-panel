@@ -4,95 +4,99 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreateCategory } from "../../../../hook/apis/shop/category/useCreateCategory";
-import Loader from "../../extra/loader";
 import { useUpdateCategory } from "../../../../hook/apis/shop/category/useUpdateCategory";
+import Loader from "../../extra/loader";
 
-const imageValidation = (file) => {
-  const allowedTypes = ["image/png"];
-  if (!file) {
-    return false;
-  }
-  const isValidType = allowedTypes.includes(file.type);
-  const maxSize = 5 * 1024 * 1024; // 5MB limit
-  const isValidSize = file.size <= maxSize;
-
-  return isValidType && isValidSize ? file : null;
-};
-
+/* -------------------- Validation -------------------- */
 const CategorySchema = z.object({
   name: z.string().min(3, "Invalid Category Name"),
   name_ar: z.string().min(3, "Invalid Category Name in Arabic"),
 });
 
+const validateImage = (file) => {
+  if (!file) return null;
+
+  const allowedTypes = ["image/png"];
+  const maxSize = 5 * 1024 * 1024; // 5MB
+
+  if (!allowedTypes.includes(file.type)) return null;
+  if (file.size > maxSize) return null;
+
+  return file;
+};
+
+/* -------------------- Component -------------------- */
 const CategoryForm = ({ data }) => {
   const [imagePreview, setImagePreview] = useState(null);
-  const [imageFile, setImageFile] = useState("hai");
+  const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
 
-  const handleFileChange = (e) => {
-    if (e.target.files.length) {
-      if (imageValidation(e.target.files[0])) {
-        const src = URL.createObjectURL(e.target.files[0]);
-        setImagePreview(src);
-        setImageFile(e.target.files[0]);
-      }
-    }
-  };
-
-  const removeImage = () => {
-    setImagePreview(null);
-    setImageFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
+  const { createCategory, isPending } = useCreateCategory();
+  const { updateCategory, updatePending } = useUpdateCategory();
 
   const {
     register,
     handleSubmit,
     reset,
-    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(CategorySchema),
     defaultValues: {
-      name: data?.name || "",
-      name_ar: data?.name_ar || "",
+      name: "",
+      name_ar: "",
     },
   });
 
+  /* -------------------- Effects -------------------- */
   useEffect(() => {
-    console.log(data);
-    if (data?.name || data?.image || data?.name_ar) {
-      setValue("name", data.name);
-      setValue("name_ar", data.name_ar);
-      setImagePreview(data.image);
-      setImageFile(data.image);
+    if (data) {
+      reset({
+        name: data.name || "",
+        name_ar: data.name_ar || "",
+      });
+      setImagePreview(data.image || null);
+      setImageFile(data.image || null);
     }
-  }, [data]);
+  }, [data, reset]);
 
-  const { createCategory, isPending } = useCreateCategory();
-  const { updateCategory, updatePending } = useUpdateCategory();
+  useEffect(() => {
+    return () => {
+      if (imagePreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
-  const handleFormSubmit = async (values) => {
+  /* -------------------- Handlers -------------------- */
+  const handleFileChange = (e) => {
+    const file = validateImage(e.target.files?.[0]);
+    if (!file) {
+      setImageFile(null);
+      return;
+    }
+
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleClose = () => {
+    reset();
+    removeImage();
+  };
+
+  const onSubmit = async (values) => {
+    if (!imageFile) return;
+
     const formData = new FormData();
     formData.append("name", values.name);
     formData.append("name_ar", values.name_ar);
-    if (!imageFile) {
-      return;
-    } else {
-      console.log(imageFile);
-
-      formData.append("image", imageFile);
-    }
+    formData.append("image", imageFile);
 
     try {
       if (data?._id) {
@@ -100,134 +104,113 @@ const CategoryForm = ({ data }) => {
       } else {
         await createCategory(formData);
       }
-      reset();
-      setImagePreview(null);
-      setImageFile(".");
+      handleClose();
     } catch (err) {
-      console.error("Login failed:", err);
+      console.error("Category submit failed:", err);
     }
   };
 
-  const handleClose = () => {
-    reset();
-    setImagePreview(null);
-    setImageFile(".");
-  };
+  /* -------------------- Render -------------------- */
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (imagePreview === null) {
-          setImageFile(null);
-        } else {
-          handleSubmit(handleFormSubmit)(e);
-        }
-      }}
-    >
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="row gy-3">
+        {/* Image Upload */}
         <div className="col-12">
-          <label>Upload Banner Image (only PNG , max 5MB)</label>
+          <label>Upload Banner Image (PNG only, max 5MB)</label>
+
           <div className="upload-image-wrapper d-flex align-items-center gap-3">
-            {/* Image preview section */}
             {imagePreview ? (
-              <div className="uploaded-img position-relative h-120-px w-120-px border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50">
+              <div className="uploaded-img position-relative h-120-px w-120-px border radius-8 overflow-hidden">
                 <button
                   type="button"
                   onClick={removeImage}
-                  className="uploaded-img__remove position-absolute top-0 end-0 z-1 text-2xxl line-height-1 me-8 mt-8 d-flex"
-                  aria-label="Remove uploaded image"
+                  className="uploaded-img__remove position-absolute top-0 end-0"
+                  aria-label="Remove image"
                 >
                   <Icon
                     icon="radix-icons:cross-2"
-                    className="text-xl text-danger-600"
-                  ></Icon>
+                    className="text-danger-600"
+                  />
                 </button>
                 <img
-                  id="uploaded-img_ _preview"
-                  className="w-100 h-100 object-fit-cover"
                   src={imagePreview}
-                  alt="Preview"
+                  alt="Category preview"
+                  className="w-100 h-100 object-fit-cover"
                 />
               </div>
             ) : (
-              !imagePreview && (
-                <label
-                  className="upload-file h-120-px w-120-px border input-form-light radius-8 overflow-hidden border-dashed bg-neutral-50 bg-hover-neutral-200 d-flex align-items-center flex-column justify-content-center gap-1"
-                  htmlFor={`upload-file-${data?._id}`}
-                  data-error={!imageFile ? "true" : "false"}
-                >
-                  <Icon
-                    icon="solar:camera-outline"
-                    className="text-xl text-secondary-light"
-                  ></Icon>
-                  <span className="fw-semibold text-secondary-light">
-                    Upload
-                  </span>
-                </label>
-              )
+              <label
+                htmlFor="upload-image"
+                className="upload-file h-120-px w-120-px border radius-8 d-flex flex-column justify-content-center align-items-center cursor-pointer"
+                data-error={!imageFile ? "true" : "false"}
+              >
+                <Icon icon="solar:camera-outline" />
+                <span>Upload</span>
+              </label>
             )}
 
             <input
-              id={`upload-file-${data?._id}`}
+              id="upload-image"
               type="file"
-              onChange={handleFileChange}
               hidden
+              accept="image/png"
               ref={fileInputRef}
-              accept="image/*"
+              onChange={handleFileChange}
             />
           </div>
+
           {!imageFile && (
             <p className="text-danger-500">
-              Invalid image file (only PNG, max 5MB)
+              Invalid image (PNG only, max 5MB)
             </p>
           )}
         </div>
+
+        {/* Category Name */}
         <div className="col-12">
           <label className="form-label">Category Name</label>
           <input
-            type="text"
-            name="#0"
             className="form-control form-control-sm"
             placeholder="Enter Category Name"
-            data-error={errors?.name ? "true" : "false"}
             {...register("name")}
           />
-          {errors?.name && (
-            <p className="text-danger-500">{errors?.name?.message}</p>
-          )}
-        </div>
-        <div className="col-12">
-          <label className="form-label">Category Name in Arabic</label>
-          <input
-            type="text"
-            name="name_ar"
-            className="form-control form-control-sm"
-            placeholder="Enter Category Name in Arabic"
-            dir="rtl"
-            data-error={errors?.name_ar ? "true" : "false"}
-            {...register("name_ar")}
-          />
-          {errors?.name_ar && (
-            <p className="text-danger-500">{errors?.name_ar?.message}</p>
+          {errors.name && (
+            <p className="text-danger-500">{errors.name.message}</p>
           )}
         </div>
 
-        <div className="mt-10 d-flex gap-2 justify-content-end">
+        {/* Category Name Arabic */}
+        <div className="col-12">
+          <label className="form-label">Category Name (Arabic)</label>
+          <input
+            dir="rtl"
+            className="form-control form-control-sm"
+            placeholder="Enter Category Name in Arabic"
+            {...register("name_ar")}
+          />
+          {errors.name_ar && (
+            <p className="text-danger-500">{errors.name_ar.message}</p>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="mt-10 d-flex justify-content-end gap-2">
           <button
-            onClick={handleClose}
             type="button"
+            onClick={handleClose}
             className="btn btn-danger-600"
             data-bs-dismiss="modal"
           >
             Close
           </button>
+
           <button
             type="submit"
             className="btn btn-success-600"
-            data-bs-dismiss={data && "modal"}
+            disabled={isPending || updatePending}
           >
             {isPending || updatePending ? (
-              <Loader loading={isPending || updatePending} />
+              <Loader loading />
             ) : (
               "Save Category"
             )}

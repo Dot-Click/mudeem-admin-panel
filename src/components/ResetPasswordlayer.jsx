@@ -24,7 +24,6 @@ const ResetPasswordLayer = () => {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(ResetPasswordSchema),
@@ -108,9 +107,8 @@ const ResetPasswordLayer = () => {
                   </div>
                   <span
                     onClick={() => setHidePassword(!hidePassword)}
-                    className={`toggle-password ${
-                      hidePassword ? "ri-eye-off-line" : "ri-eye-line"
-                    } cursor-pointer position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light`}
+                    className={`toggle-password ${hidePassword ? "ri-eye-off-line" : "ri-eye-line"
+                      } cursor-pointer position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light`}
                     data-toggle="#password"
                   />
                 </div>

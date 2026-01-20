@@ -63,7 +63,12 @@ const ProductsTable = ({ isSelectable, rows }) => {
               <td>#{item?._id.slice(0, 6) + i}</td>
               <td className="text-capitalize">
                 <div className="d-flex gap-1 align-items-center">
-                  <img src={item?.images[0]} className="table-row-image" />
+                  <img
+                    src={item?.images[0]}
+                    alt=""
+                    className="table-row-image"
+                  />
+
                   {item?.featured && (
                     <Icon
                       className="text-warning-500"
@@ -82,7 +87,7 @@ const ProductsTable = ({ isSelectable, rows }) => {
                   )}
                 </div>
               </td>
-              <td className="text-capitalize text-end"> 
+              <td className="text-capitalize text-end">
                 <SingleDefaultTooltipThree
                   title={item?.name_ar ? item?.name_ar : "nulll"}
                   child={item?.name_ar ? item?.name_ar?.slice(0, 15) + "..." : "nulll"}
