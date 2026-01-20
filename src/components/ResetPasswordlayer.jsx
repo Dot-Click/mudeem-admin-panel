@@ -17,7 +17,7 @@ const ResetPasswordSchema = z.object({
     ),
 });
 const ResetPasswordLayer = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { email } = useParams();
   const [hidePassword, setHidePassword] = useState(true);
 

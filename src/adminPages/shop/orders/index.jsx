@@ -7,7 +7,7 @@ import { useGetOrder } from "../../../hook/apis/shop/order/useGetOrder";
 import DataNotFound from "../../../components/custom/extra/dataNotFound";
 import Loader from "../../../components/custom/extra/loader";
 const Order = () => {
-  const [filters, setFilters] = useState({ search: "" });
+  const [filters] = useState({ search: "" });
   const { orders, isPending } = useGetOrder(filters);
 
   // const handleSearch = (value) => {

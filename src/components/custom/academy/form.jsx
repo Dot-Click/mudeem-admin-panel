@@ -38,8 +38,8 @@ const fileValidation = (file) => {
 const Form = ({ data }) => {
   console.log("print data", data);
 
-  const { createBook, isPending } = useCreateBook();
-  const { updateBook, isLoading, isError, error } = useUpdateBook();
+  const { createBook } = useCreateBook();
+  const { updateBook } = useUpdateBook();
   const [imagePreview, setImagePreview] = useState({
     file: null,
     src: "",
@@ -166,7 +166,7 @@ const Form = ({ data }) => {
 
   useEffect(() => {
     if (data?._id) {
-      setValue("name", data?.title);  
+      setValue("name", data?.title);
       setValue("name_ar", data?.title_ar);
       setValue("author", data?.author);
       setValue("author_ar", data?.author_ar);
