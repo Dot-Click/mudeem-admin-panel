@@ -3,7 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { createEventId, INITIAL_EVENTS } from "../../hook/event-utils.js";
+import { createEventId } from "../../hook/event-utils.js";
 
 export default function Calendar({ data }) {
   const [events, setEvents] = useState([]);
