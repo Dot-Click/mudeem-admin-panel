@@ -14,11 +14,12 @@ const FarmDetail = ({ data }) => {
               />
             ) : (
               <img
-                src={mainImage}
+                src={data?.images?.[0]} // Use first image if only one
                 className="post-detail-image"
                 alt={data?.location ? `Farm at ${data.location}` : "Farm image"}
               />
             )}
+
           </div>
         </div>
 

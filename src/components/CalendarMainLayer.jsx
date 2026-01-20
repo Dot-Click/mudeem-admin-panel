@@ -6,10 +6,8 @@ import DeleteModalContent from "./custom/extra/deleteModalContent";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateEvents } from "../hook/apis/events/useCreateEvent";
-import { useUpdateEvent } from "../hook/apis/events/useUpdateEvent";
 import moment from "moment";
-import { useDeletedEvent } from "../hook/apis/events/useDeleteEvent";
+
 
 
 const EventSchema = z.object({
