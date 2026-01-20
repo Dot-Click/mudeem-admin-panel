@@ -97,12 +97,14 @@ const Form = ({ data }) => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     return () => {
       if (imagePreview.src) URL.revokeObjectURL(imagePreview.src);
       if (pdfPreview.src) URL.revokeObjectURL(pdfPreview.src);
     };
-  }, [imagePreview, pdfPreview]);
+  }, []);
+
 
   const {
     register,
