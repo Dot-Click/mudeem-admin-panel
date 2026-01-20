@@ -98,16 +98,11 @@ const Form = ({ data }) => {
   };
 
   useEffect(() => {
-    // Cleanup function to revoke object URLs
     return () => {
-      if (imagePreview?.src) {
-        URL.revokeObjectURL(imagePreview.src);
-      }
-      if (pdfPreview?.src) {
-        URL.revokeObjectURL(pdfPreview.src);
-      }
+      if (imagePreview.src) URL.revokeObjectURL(imagePreview.src);
+      if (pdfPreview.src) URL.revokeObjectURL(pdfPreview.src);
     };
-  }, [imagePreview?.src, pdfPreview?.src]); // <-- only depend on src strings
+  }, [imagePreview, pdfPreview]);
 
   const {
     register,
