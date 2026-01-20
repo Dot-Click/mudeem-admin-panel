@@ -97,14 +97,18 @@ const Form = ({ data }) => {
     }
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Fix for Line 106: Cleanup of Object URLs
   useEffect(() => {
     return () => {
-      if (imagePreview.src) URL.revokeObjectURL(imagePreview.src);
-      if (pdfPreview.src) URL.revokeObjectURL(pdfPreview.src);
+      // Only revoke if it's a local blob URL
+      if (imagePreview.src && imagePreview.src.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview.src);
+      }
+      if (pdfPreview.src && pdfPreview.src.startsWith('blob:')) {
+        URL.revokeObjectURL(pdfPreview.src);
+      }
     };
-  }, []);
-
+  }, [imagePreview.src, pdfPreview.src]); // Added dependencies here
 
   const {
     register,
@@ -165,6 +169,7 @@ const Form = ({ data }) => {
 
   console.log(pdfPreview, imagePreview);
 
+  // Fix for Line 192: Populating form data
   useEffect(() => {
     if (data?._id) {
       setValue("name", data?.title);
@@ -182,14 +187,16 @@ const Form = ({ data }) => {
       setValue("type", data?.type);
 
       if (data?.content) {
-        setPdfPreview({ ...pdfPreview, src: data?.content });
+        // Use functional update to avoid dependency on 'pdfPreview'
+        setPdfPreview(prev => ({ ...prev, src: data?.content }));
       }
 
       if (data?.thumbnail) {
-        setImagePreview({ ...imagePreview, src: data?.thumbnail });
+        // Use functional update to avoid dependency on 'imagePreview'
+        setImagePreview(prev => ({ ...prev, src: data?.thumbnail }));
       }
     }
-  }, [data, setValue]);
+  }, [data, setValue]); // Dependencies are now correct
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
