@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
 import { useGetMe } from "../hook/apis/auth/useMe";
 import { useLogout } from "../hook/apis/auth/useLogout";
@@ -10,11 +10,14 @@ const MasterLayout = ({ children }) => {
   let [sidebarActive, seSidebarActive] = useState(false);
   let [mobileMenu, setMobileMenu] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { logout } = useLogout();
   const { me } = useGetMe();
   const { notifications, isLoading, isError, error } = useGetNotifications();
 
   const [settings, setSettings] = useState(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileDropdownRef = useRef(null);
 
   useEffect(() => {
     const storedSettings = localStorage.getItem("settings");
@@ -87,10 +90,32 @@ const MasterLayout = ({ children }) => {
   const handleLogut = async () => {
     try {
       await logout();
+      setProfileOpen(false);
+      navigate("/");
     } catch (err) {
       console.error("Logout failed:", err);
     }
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!profileDropdownRef.current) return;
+      if (!profileDropdownRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setProfileOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
 
   let sidebarControl = () => {
@@ -973,11 +998,12 @@ const MasterLayout = ({ children }) => {
                 </div>
 
                 {/* Notification dropdown end */}
-                <div className="dropdown">
+                <div className="dropdown" ref={profileDropdownRef}>
                   <button
                     className="d-flex justify-content-center align-items-center rounded-circle"
                     type="button"
-                    data-bs-toggle="dropdown"
+                    aria-expanded={profileOpen ? "true" : "false"}
+                    onClick={() => setProfileOpen((v) => !v)}
                   >
                     <img
                       src={me?.user?.profilePicture || "/default.png"}
@@ -994,7 +1020,7 @@ const MasterLayout = ({ children }) => {
                     />
 
                   </button>
-                  <div className="dropdown-menu to-top dropdown-menu-sm">
+                  <div className={`dropdown-menu to-top dropdown-menu-sm ${profileOpen ? "show" : ""}`}>
                     <div className="py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
                       <div>
                         <h6 className="text-lg text-primary-light fw-semibold mb-2 text-capitalize">
@@ -1004,7 +1030,12 @@ const MasterLayout = ({ children }) => {
                           {me?.user?.email || "Admin"}
                         </span>
                       </div>
-                      <button type="button" className="hover-text-danger">
+                      <button
+                        type="button"
+                        className="hover-text-danger"
+                        onClick={() => setProfileOpen(false)}
+                        aria-label="Close"
+                      >
                         <Icon
                           icon="radix-icons:cross-1"
                           className="icon text-xl"
@@ -1049,13 +1080,14 @@ const MasterLayout = ({ children }) => {
                         </Link>
                       </li> */}
                       <li>
-                        <Link
+                        <button
+                          type="button"
                           className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3"
                           onClick={handleLogut}
                         >
                           <Icon icon="lucide:power" className="icon text-xl" />{" "}
                           Log Out
-                        </Link>
+                        </button>
                       </li>
                     </ul>
                   </div>

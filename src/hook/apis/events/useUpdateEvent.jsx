@@ -9,7 +9,7 @@ export const useUpdateEvent = () => {
       try {
         const response = await custAxios.put(`/events/${id}`, payload);
         toast.success("Event updated successful");
-        queryClient.invalidateQueries("event");
+        queryClient.invalidateQueries({ queryKey: ["event"] });
         return response?.data?.data;
       } catch (err) {
         toast.error(err.response?.data?.message || "Event updated failed");

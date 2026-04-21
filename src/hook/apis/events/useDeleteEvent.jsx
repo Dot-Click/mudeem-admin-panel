@@ -10,7 +10,7 @@ export const useDeletedEvent = () => {
       try {
         const response = await custAxios.delete(`/events/${id}`);
         toast.success("Event deleted successful");
-        queryClient.invalidateQueries("event");
+        queryClient.invalidateQueries({ queryKey: ["event"] });
         return response?.data?.data;
       } catch (err) {
         toast.error(err.response?.data?.message || "Event deleted failed");
