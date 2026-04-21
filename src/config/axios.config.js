@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const baseURL = "https://mudeem-be-production.up.railway.app/";
+export const baseURL = "https://mudeem-be-production.up.railway.app";
 // export const baseURL = "http://localhost:8001/";
 // export const baseURL = "https://api.mudeem.ae/";
 // axios instance for json data

@@ -1000,7 +1000,7 @@ const MasterLayout = ({ children }) => {
                 {/* Notification dropdown end */}
                 <div className="dropdown" ref={profileDropdownRef}>
                   <button
-                    className="d-flex justify-content-center align-items-center rounded-circle"
+                    className="d-flex justify-content-center align-items-center rounded-circle border-0 bg-transparent"
                     type="button"
                     aria-expanded={profileOpen ? "true" : "false"}
                     onClick={() => setProfileOpen((v) => !v)}
@@ -1020,7 +1020,24 @@ const MasterLayout = ({ children }) => {
                     />
 
                   </button>
-                  <div className={`dropdown-menu to-top dropdown-menu-sm ${profileOpen ? "show" : ""}`}>
+                  <div 
+                    className={`dropdown-menu dropdown-menu-end shadow-lg border ${profileOpen ? "show" : ""}`}
+                    style={{
+                      display: profileOpen ? "block" : "none",
+                      position: "absolute",
+                      top: "calc(100% + 12px)",
+                      right: "-10px",
+                      left: "auto",
+                      minWidth: "240px",
+                      zIndex: 9999,
+                      backgroundColor: "white",
+                      borderRadius: "12px",
+                      padding: "16px",
+                      visibility: profileOpen ? "visible" : "hidden",
+                      opacity: profileOpen ? 1 : 0,
+                      transition: "all 0.2s ease"
+                    }}
+                  >
                     <div className="py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
                       <div>
                         <h6 className="text-lg text-primary-light fw-semibold mb-2 text-capitalize">
