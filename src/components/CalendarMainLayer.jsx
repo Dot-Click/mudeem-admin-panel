@@ -97,7 +97,10 @@ const CalendarMainLayer = ({ data }) => {
 
               {/* Event List */}
               <div className="mt-32">
-                {data?.data?.slice(0, 4)?.map((item, i) => (
+                {[...(data || [])]
+                  ?.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime))
+                  ?.slice(0, 4)
+                  ?.map((item, i) => (
                   <div
                     key={i}
                     className="event-item d-flex align-items-center justify-content-between gap-4 pb-16 mb-16 border border-start-0 border-end-0 border-top-0"
@@ -169,7 +172,7 @@ const CalendarMainLayer = ({ data }) => {
         <div className="col-xxl-9 col-lg-8">
           <div className="card h-100 p-0">
             <div className="card-body p-24">
-              <Calendar data={data?.data} />
+              <Calendar data={data} />
             </div>
           </div>
         </div>

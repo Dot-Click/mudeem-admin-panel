@@ -5,7 +5,7 @@ export const useGetEvents = (filters) => {
   const { data, ...rest } = useQuery({
     queryFn: async () => {
       const data = await custAxios.get("/events", {
-        params: filters,
+        params: { ...filters, limit: filters?.limit || 1000 },
       });
       return data?.data?.data;
     },

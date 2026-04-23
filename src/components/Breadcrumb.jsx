@@ -1,4 +1,3 @@
-import React from "react";
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 const Breadcrumb = ({ heading = "Dashboard", title }) => {
