@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import custAxios from "../../../config/axios.config";
 
-export const useGetUsers = () => {
+export const useGetUsers = (filters = {}) => {
   const { data, ...rest } = useQuery({
     queryFn: async () => {
-      const data = await custAxios.get("/user");
-      return data?.data?.data;
+      const response = await custAxios.get("/user", { params: filters });
+      return Array.isArray(response?.data?.data) ? response.data.data : [];
     },
-    queryKey: ["user"],
-    refetchOnWindowFocus: false,
-    staleTime: Infinity,
-    retry: 3,
+    queryKey: ["user", filters?.search || ""],
+    refetchOnWindowFocus: true,
+    staleTime: 5000,
+    retry: 2,
   });
-  return { user: data, ...rest };
+  return { user: data || [], ...rest };
 };

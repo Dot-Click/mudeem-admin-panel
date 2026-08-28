@@ -101,6 +101,7 @@ import Farm from "../adminPages/farm";
 import Careers from "../adminPages/careers";
 import Dashboard from "../adminPages/dashboard";
 import Users from "../adminPages/user";
+import PushNotificationsPage from "../adminPages/notifications";
 import Settings from "../adminPages/setting";
 // import { useGetSettings } from "../hook/apis/setting/getSettings";
 import Profile from "../adminPages/profile";
@@ -297,6 +298,7 @@ const Router = () => {
           <Route exact path="/farm-banner" element={<FarmBanner />} />
           <Route exact path="/careers" element={<Careers />} />
           <Route exact path="/user" element={<Users />} />
+          <Route exact path="/push-notifications" element={<PushNotificationsPage />} />
           <Route exact path="/setting" element={<Settings />} />
           <Route exact path="/my-profile" element={<Profile />} />
         </Routes>

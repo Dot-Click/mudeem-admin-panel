@@ -44,41 +44,56 @@ const TopCustomersOne = () => {
             ))
           ) : isError ? (
             <div>Error: {error.message}</div>
-          ) : (
+          ) : notifications?.length > 0 ? (
             // Render actual notifications when data is loaded
             <div>
-              {notifications?.map((notification) => {
-                // Modify content if needed (e.g., replacing "Congratulations! You" with the username)
-                const modifiedContent = notification.content.replace(
+              {notifications.map((notification) => {
+                const userName = notification?.user?.name || "User";
+                const rawContent = notification?.content || "";
+                const modifiedContent = rawContent.replace(
                   "Congratulations! You",
-                  notification.user.name
+                  userName
                 );
 
                 return (
                   <div
                     key={notification._id}
-                    className="d-flex align-items-start gap-2 mb-3 justify-content-between"
+                    className="d-flex align-items-start gap-2 mb-3 justify-content-between border-bottom pb-12"
                     style={{ padding: "8px 0" }}
                   >
-                    <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
-                      <img
-                        src={notification?.user?.profilePicture || "/default.png"}
-                        alt="User Profile"
-                        className="w-44-px h-44-px rounded-circle flex-shrink-0"
-                      />
+                    <div className="text-black hover-bg-transparent d-flex align-items-center gap-3">
+                      {notification?.user?.profilePicture ? (
+                        <img
+                          src={notification.user.profilePicture}
+                          alt="User Profile"
+                          className="w-44-px h-44-px rounded-circle object-fit-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <div
+                          className="w-44-px h-44-px rounded-circle bg-success-50 text-success-600 d-flex align-items-center justify-content-center fw-bold text-sm flex-shrink-0"
+                        >
+                          {userName.charAt(0).toUpperCase()}
+                        </div>
+                      )}
                       <div>
-                        <h6 className="text-md fw-semibold mb-1">{notification.title}</h6>
+                        <h6 className="text-md fw-semibold mb-1">{notification.title || "Notification"}</h6>
                         <p className="mb-0 text-sm text-secondary-light text-wrap">
-                          {modifiedContent}
+                          {modifiedContent || notification.title}
                         </p>
                       </div>
                     </div>
                     <span className="text-xxs text-secondary-light flex-shrink-0">
-                      {new Date(notification.createdAt).toLocaleTimeString()}
+                      {notification?.createdAt
+                        ? new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : ""}
                     </span>
                   </div>
                 );
               })}
+            </div>
+          ) : (
+            <div className="text-center py-40 text-secondary-light">
+              <p className="mb-0 text-sm">No recent notifications.</p>
             </div>
           )}
         </div>

@@ -4,12 +4,13 @@ import custAxios from "../../../config/axios.config";
 export const useGetMe = () => {
   const { data, ...rest } = useQuery({
     queryFn: async () => {
-      const data = await custAxios.get("/auth/me");
-      return data?.data?.data;
+      const response = await custAxios.get("/auth/me");
+      return response?.data?.data;
     },
-    queryKey: ["user"],
-    refetchOnWindowFocus: false,
-    retry: 0,
+    queryKey: ["me"],
+    refetchOnWindowFocus: true,
+    staleTime: 5000,
+    retry: 1,
   });
   return { me: data, ...rest };
 };

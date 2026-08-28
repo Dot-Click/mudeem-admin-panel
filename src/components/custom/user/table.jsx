@@ -29,46 +29,74 @@ const UserTable = ({ isSelectable, rows }) => {
           )}
 
           <th scope="col">ID</th>
-          <th scope="col">User Name</th>
+          <th scope="col">User</th>
           <th scope="col">Email</th>
           <th scope="col">Phone</th>
+          <th scope="col">Role</th>
           <th scope="col">Created At</th>
-          <th scope="col">Activate/Deactivate</th>
+          <th scope="col">Status</th>
         </tr>
       </thead>
       <tbody>
         {rows?.map((item, i) => (
-          <tr>
+          <tr key={item?._id || i}>
             {isSelectable && (
               <td>
                 <div className="form-check style-check d-flex align-items-center">
                   <input className="form-check-input" type="checkbox" />
-                  <label className="form-check-label">01</label>
+                  <label className="form-check-label">{String(i + 1).padStart(2, "0")}</label>
                 </div>
               </td>
             )}
-            <td>#{item?._id.slice(0, 6) + i}</td>
-            <td>{item?.name}</td>
-            <td>{item?.email}</td>
-            <td>{item?.phone}</td>
-
-            <td> {moment(item?.pickupDateTime).format("DD/MMM/YYYY")}</td>
             <td>
-              {" "}
-              <div className="form-switch switch-success d-flex align-items-center gap-3">
+              <span className="text-xs text-secondary-light font-monospace">
+                #{item?._id ? String(item._id).slice(-6) : `USR${i}`}
+              </span>
+            </td>
+            <td>
+              <div className="d-flex align-items-center gap-2">
+                <div className="w-32-px h-32-px rounded-circle bg-success-100 text-success-700 d-flex align-items-center justify-content-center fw-bold text-xs">
+                  {item?.name ? item.name.charAt(0).toUpperCase() : "U"}
+                </div>
+                <div>
+                  <span className="fw-medium d-block text-sm">{item?.name || "Unnamed"}</span>
+                  <span className="text-xs text-secondary-light">@{item?.username || "no-username"}</span>
+                </div>
+              </div>
+            </td>
+            <td><span className="text-sm">{item?.email}</span></td>
+            <td><span className="text-sm">{item?.phone || "N/A"}</span></td>
+            <td>
+              <span className={`badge text-capitalize text-xs px-8 py-4 ${
+                item?.role === 'admin'
+                  ? 'bg-danger-100 text-danger-700'
+                  : item?.role === 'vendor'
+                  ? 'bg-warning-100 text-warning-700'
+                  : 'bg-success-100 text-success-700'
+              }`}>
+                {item?.role || "user"}
+              </span>
+            </td>
+            <td>
+              <span className="text-sm text-secondary-light">
+                {item?.createdAt ? moment(item.createdAt).format("DD MMM YYYY") : "N/A"}
+              </span>
+            </td>
+            <td>
+              <div className="form-switch switch-success d-flex align-items-center gap-2">
                 <input
                   className="form-check-input"
                   type="checkbox"
                   role="switch"
                   id={"switch" + i}
-                  defaultChecked={item?.isActive}
+                  defaultChecked={item?.isActive !== false}
                   onChange={() => handleChangeStatus(item?._id)}
                 />
                 <label
-                  className="form-check-label line-height-1 fw-medium text-secondary-light"
+                  className="form-check-label line-height-1 fw-medium text-xs text-secondary-light"
                   htmlFor={"switch" + i}
                 >
-                  Activate
+                  {item?.isActive !== false ? "Active" : "Disabled"}
                 </label>
               </div>
             </td>

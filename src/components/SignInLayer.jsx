@@ -78,7 +78,6 @@ const SignInLayer = () => {
                   type="email"
                   className="form-control h-56-px bg-neutral-50 radius-12"
                   placeholder="Email"
-                  defaultValue="admin@gmail.com"
                   data-error={errors?.email ? "true" : "false"}
                   {...register("email")}
                 />
@@ -98,7 +97,6 @@ const SignInLayer = () => {
                     className="form-control h-56-px bg-neutral-50 radius-12"
                     id="password"
                     placeholder="Password"
-                    defaultValue="Password@123"
                     data-error={errors?.password ? "true" : "false"}
                     {...register("password")}
                   />

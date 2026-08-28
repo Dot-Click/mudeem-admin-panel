@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import MasterLayout from "../../masterLayout/MasterLayout";
 import Breadcrumb from "../../components/Breadcrumb";
 import TableDataLayer from "../../components/TableDataLayer";
@@ -8,7 +8,26 @@ import Loader from "../../components/custom/extra/loader";
 import DataNotFound from "../../components/custom/extra/dataNotFound";
 
 const Users = () => {
-  const { user, isPending } = useGetUsers();
+  const [search, setSearch] = useState("");
+  const { user, isPending } = useGetUsers({ search });
+
+  const handleSearch = (value) => {
+    setSearch(value || "");
+  };
+
+  const filteredUsers = Array.isArray(user)
+    ? user.filter((u) => {
+        if (!search.trim()) return true;
+        const q = search.toLowerCase().trim();
+        return (
+          u?.name?.toLowerCase().includes(q) ||
+          u?.email?.toLowerCase().includes(q) ||
+          u?.username?.toLowerCase().includes(q) ||
+          u?.phone?.toLowerCase().includes(q) ||
+          u?.role?.toLowerCase().includes(q)
+        );
+      })
+    : [];
 
   return (
     <MasterLayout>
@@ -16,6 +35,7 @@ const Users = () => {
 
       <TableDataLayer
         title={"Users"}
+        searchFunction={handleSearch}
         body={
           isPending ? (
             <div
@@ -24,12 +44,16 @@ const Users = () => {
             >
               <Loader loading={isPending} size={150} color="#15803d" />
             </div>
-          ) : user?.length > 0 ? (
-            <UserTable rows={user} />
+          ) : filteredUsers?.length > 0 ? (
+            <UserTable rows={filteredUsers} />
           ) : (
             <DataNotFound
               heading={"Users Not Found"}
-              text={"There is no users found , based on your search!"}
+              text={
+                search
+                  ? `No users match "${search}".`
+                  : "No registered users found in the database."
+              }
             />
           )
         }

@@ -41,12 +41,12 @@ const TopSellingProductOne = () => {
                     <td>
                       <div className="d-flex align-items-center">
                         <div
-                          className="placeholder-glow"
+                          className="placeholder-glow me-12"
                           style={{ width: "40px", height: "40px", borderRadius: "50%" }}
                         >
                           <div className="placeholder" style={{ width: "100%", height: "100%", borderRadius: "50%" }} />
                         </div>
-                        <div className="flex-grow-1 d-flex ms-2">
+                        <div className="flex-grow-1">
                           <div className="placeholder-glow">
                             <div className="placeholder col-6" />
                           </div>
@@ -70,51 +70,48 @@ const TopSellingProductOne = () => {
                     </td>
                   </tr>
                 ))
-              ) : (
-                // Render actual data when loaded
-                leaderboard?.map((entry, index) => (
-                  <tr key={entry._id}>
+              ) : leaderboard?.length > 0 ? (
+                leaderboard.map((entry, index) => (
+                  <tr key={entry._id || index}>
                     <td>
                       <div className="d-flex align-items-center">
-                        <img
-                          src={entry.profilePicture || "/default.png"}
-                          alt={entry.name}
-                          className="flex-shrink-0 me-12 radius-8 me-12"
-                          style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-                        />
-                        <div className="flex-grow-1 d-flex">
-                          <h6 className="text-md mb-0 fw-normal">{entry.name}</h6>
-                          {index === 0 ? (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="26"
-                              height="26"
-                              fill="none"
-                              viewBox="0 0 26 26"
+                        <div className="position-relative me-12">
+                          {entry.profilePicture ? (
+                            <img
+                              src={entry.profilePicture}
+                              alt={entry.name}
+                              className="rounded-circle object-fit-cover"
+                              style={{ width: "40px", height: "40px" }}
+                            />
+                          ) : (
+                            <div
+                              className="rounded-circle bg-success-100 text-success-700 d-flex align-items-center justify-content-center fw-bold text-sm"
+                              style={{ width: "40px", height: "40px" }}
                             >
-                              {/* Gold Medal SVG */}
-                            </svg>
-                          ) : index === 1 ? (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              {/* Silver Medal SVG */}
-                            </svg>
-                          ) : index === 2 ? (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="28"
-                              height="28"
-                              fill="none"
-                              viewBox="0 0 28 28"
-                            >
-                              {/* Bronze Medal SVG */}
-                            </svg>
-                          ) : null}
+                              {entry?.name ? entry.name.charAt(0).toUpperCase() : "U"}
+                            </div>
+                          )}
+                          <span
+                            className={`position-absolute bottom-0 end-0 badge rounded-pill px-6 py-2 text-xxs ${
+                              index === 0
+                                ? "bg-warning text-dark"
+                                : index === 1
+                                ? "bg-secondary text-white"
+                                : index === 2
+                                ? "bg-bronze text-white"
+                                : "bg-light text-muted"
+                            }`}
+                            style={{
+                              fontSize: "10px",
+                              transform: "translate(25%, 25%)",
+                              backgroundColor: index === 2 ? "#cd7f32" : undefined
+                            }}
+                          >
+                            #{index + 1}
+                          </span>
+                        </div>
+                        <div>
+                          <h6 className="text-md mb-0 fw-semibold">{entry.name || "Unnamed"}</h6>
                         </div>
                       </div>
                     </td>
@@ -123,12 +120,20 @@ const TopSellingProductOne = () => {
                         {entry.email || "N/A"}
                       </span>
                     </td>
-                    <td>{entry.phone || "N/A"}</td>
-                    <td className="text-success-500 fw-bold">
-                      {entry.points || "N/A"} pts
+                    <td><span className="text-sm text-secondary-light">{entry.phone || "N/A"}</span></td>
+                    <td>
+                      <span className="badge bg-success-50 text-success-700 fw-bold px-12 py-6 text-sm">
+                        {entry.points ?? 0} pts
+                      </span>
                     </td>
                   </tr>
                 ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="text-center py-32 text-secondary-light">
+                    No leaderboard rankings available yet.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

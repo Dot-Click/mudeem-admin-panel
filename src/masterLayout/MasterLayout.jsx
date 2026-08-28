@@ -4,7 +4,8 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
 import { useGetMe } from "../hook/apis/auth/useMe";
 import { useLogout } from "../hook/apis/auth/useLogout";
-import useGetNotifications from '../hook/apis/Notifications/useGetNotifications';
+import useGetNotifications from "../hook/apis/Notifications/useGetNotifications";
+import useMarkNotificationsRead from "../hook/apis/Notifications/useMarkNotificationsRead";
 
 const MasterLayout = ({ children }) => {
   let [sidebarActive, seSidebarActive] = useState(false);
@@ -13,11 +14,18 @@ const MasterLayout = ({ children }) => {
   const navigate = useNavigate();
   const { logout } = useLogout();
   const { me } = useGetMe();
-  const { notifications, isLoading, isError, error } = useGetNotifications();
+  const { notifications, isLoading, isError } = useGetNotifications();
+  const { mutate: markNotificationsRead } = useMarkNotificationsRead();
+
+  const unreadCount = Array.isArray(notifications)
+    ? notifications.filter((n) => !n.seen).length
+    : 0;
 
   const [settings, setSettings] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const profileDropdownRef = useRef(null);
+  const notificationDropdownRef = useRef(null);
 
   useEffect(() => {
     const storedSettings = localStorage.getItem("settings");
@@ -99,14 +107,25 @@ const MasterLayout = ({ children }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!profileDropdownRef.current) return;
-      if (!profileDropdownRef.current.contains(event.target)) {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target)
+      ) {
         setProfileOpen(false);
+      }
+      if (
+        notificationDropdownRef.current &&
+        !notificationDropdownRef.current.contains(event.target)
+      ) {
+        setNotificationOpen(false);
       }
     };
 
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") setProfileOpen(false);
+      if (event.key === "Escape") {
+        setProfileOpen(false);
+        setNotificationOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -478,6 +497,21 @@ const MasterLayout = ({ children }) => {
                   className="menu-icon"
                 />
                 <span>Users</span>
+              </NavLink>
+            </li>
+            {/* push notifications */}
+            <li>
+              <NavLink
+                to="/push-notifications"
+                className={(navData) =>
+                  navData.isActive ? "active-page mb-1" : ""
+                }
+              >
+                <Icon
+                  icon="material-symbols:notifications-active-rounded"
+                  className="menu-icon"
+                />
+                <span>Push Notifications</span>
               </NavLink>
             </li>
             {/* settings */}
@@ -935,65 +969,135 @@ const MasterLayout = ({ children }) => {
                 </div> */}
                 {/* Message dropdown end */}
 
-                <div className="dropdown">
+                <div className="dropdown" ref={notificationDropdownRef}>
                   <button
-                    className="has-indicator w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"
+                    className="has-indicator w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center position-relative border-0"
                     type="button"
-                    data-bs-toggle="dropdown"
+                    aria-expanded={notificationOpen ? "true" : "false"}
+                    onClick={() => {
+                      const nextState = !notificationOpen;
+                      setNotificationOpen(nextState);
+                      setProfileOpen(false);
+                      if (nextState && unreadCount > 0) {
+                        markNotificationsRead({});
+                      }
+                    }}
                   >
                     <Icon icon="iconoir:bell" className="text-primary-light text-xl" />
-                  </button>
-                  <div className="dropdown-menu to-top dropdown-menu-lg p-0">
-                    <div className="m-16 py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
-                      <div>
-                        <h6 className="text-lg text-primary-light fw-semibold mb-0">Notifications</h6>
-                      </div>
-                      <span className="text-primary-600 fw-semibold text-lg w-40-px h-40-px rounded-circle bg-base d-flex justify-content-center align-items-center">
-                        {notifications?.length || 0}
+                    {unreadCount > 0 && (
+                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-white text-xxs px-6 py-2">
+                        {unreadCount > 99 ? "99+" : unreadCount}
                       </span>
+                    )}
+                  </button>
+                  <div
+                    className={`dropdown-menu to-top dropdown-menu-lg p-0 ${notificationOpen ? "show" : ""}`}
+                    style={{
+                      display: notificationOpen ? "block" : "none",
+                      position: "absolute",
+                      right: 0,
+                      top: "100%",
+                      zIndex: 1050,
+                      minWidth: "340px",
+                    }}
+                  >
+                    <div className="m-16 py-12 px-16 radius-8 bg-primary-50 mb-12 d-flex align-items-center justify-content-between gap-2">
+                      <div>
+                        <h6 className="text-md text-primary-light fw-semibold mb-0">Notifications</h6>
+                        <span className="text-xs text-secondary-light">
+                          {unreadCount > 0 ? `${unreadCount} unread` : "All notifications read"}
+                        </span>
+                      </div>
+                      {unreadCount > 0 ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            markNotificationsRead({});
+                          }}
+                          className="btn btn-sm btn-outline-primary text-xs py-4 px-8 radius-6"
+                        >
+                          Mark all read
+                        </button>
+                      ) : (
+                        <span className="text-primary-600 fw-semibold text-xs px-8 py-3 rounded-pill bg-base">
+                          {notifications?.length || 0} Total
+                        </span>
+                      )}
                     </div>
                     <div className="max-h-400-px overflow-y-auto scroll-sm pe-4">
                       {isLoading ? (
-                        <div>Loading...</div>
+                        <div className="text-center py-20 text-secondary-light text-sm">Loading...</div>
                       ) : isError ? (
-                        <div>Error: {error.message}</div>
-                      ) : (
-                        notifications?.map((notification) => {
-                          // Replace "Congratulations! You" with the username
-                          const modifiedContent = notification.content.replace(
+                        <div className="text-center py-20 text-danger text-sm">Error loading notifications</div>
+                      ) : notifications?.length > 0 ? (
+                        notifications.slice(0, 10).map((notification) => {
+                          const userName = notification?.user?.name || "User";
+                          const rawContent = notification?.content || "";
+                          const modifiedContent = rawContent.replace(
                             "Congratulations! You",
-                            notification.user.name // Replace with the user's name
+                            userName
                           );
 
                           return (
                             <Link
-                              to="#"
-                              className="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between"
+                              to="/push-notifications"
+                              onClick={() => {
+                                setNotificationOpen(false);
+                                if (!notification.seen) {
+                                  markNotificationsRead({ notificationId: notification._id });
+                                }
+                              }}
+                              className={`px-16 py-10 d-flex align-items-start gap-3 mb-1 justify-content-between text-start radius-8 mx-8 ${
+                                !notification.seen ? "bg-primary-50" : "hover-bg-neutral-50"
+                              }`}
                               key={notification._id}
                             >
                               <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
-                                {/* <span className="w-44-px h-44-px bg-success-subtle text-success-main rounded-circle d-flex justify-content-center align-items-center flex-shrink-0">
-                                  <Icon icon="bitcoin-icons:verify-outline" className="icon text-xxl" />
-                                </span> */}
-                                <img
-                                  src={notification.user.profilePicture || "/default.png"}
-                                  alt="User Profile"
-                                  className="w-44-px h-44-px rounded-circle flex-shrink-0"
-                                />
+                                {notification?.user?.profilePicture ? (
+                                  <img
+                                    src={notification.user.profilePicture}
+                                    alt={userName}
+                                    className="w-40-px h-40-px rounded-circle flex-shrink-0 object-fit-cover"
+                                  />
+                                ) : (
+                                  <div className="w-40-px h-40-px rounded-circle bg-success-100 text-success-700 fw-bold d-flex align-items-center justify-content-center flex-shrink-0 text-sm">
+                                    {userName.charAt(0).toUpperCase()}
+                                  </div>
+                                )}
                                 <div>
-                                  <h6 className="text-md fw-semibold mb-4">{notification.title}</h6>
-                                  <p className="mb-0 text-sm text-secondary-light text-w-200-px">{modifiedContent}</p>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <h6 className="text-sm fw-semibold mb-2 text-start">{notification.title}</h6>
+                                    {!notification.seen && (
+                                      <span className="w-6-px h-6-px rounded-circle bg-danger d-inline-block flex-shrink-0" />
+                                    )}
+                                  </div>
+                                  <p className="mb-0 text-xs text-secondary-light text-start text-w-200-px">{modifiedContent}</p>
                                 </div>
                               </div>
-                              <span className="text-sm text-secondary-light flex-shrink-0">
-                                {new Date(notification.createdAt).toLocaleTimeString()}
+                              <span className="text-xxs text-secondary-light flex-shrink-0">
+                                {notification?.createdAt ? new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
                               </span>
                             </Link>
                           );
                         })
+                      ) : (
+                        <div className="text-center py-24 text-secondary-light text-sm">
+                          <Icon icon="solar:bell-linear" className="text-2xl mb-8 d-block mx-auto text-neutral-400" />
+                          No notifications yet
+                        </div>
                       )}
                     </div>
-
+                    <div className="text-center py-12 px-16 border-top">
+                      <Link
+                        to="/push-notifications"
+                        onClick={() => setNotificationOpen(false)}
+                        className="text-primary-600 fw-semibold text-sm hover-text-primary d-flex align-items-center justify-content-center gap-1"
+                      >
+                        <span>Send & Manage Notifications</span>
+                        <Icon icon="material-symbols:arrow-right-alt-rounded" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
 
@@ -1003,7 +1107,10 @@ const MasterLayout = ({ children }) => {
                     className="d-flex justify-content-center align-items-center rounded-circle border-0 bg-transparent"
                     type="button"
                     aria-expanded={profileOpen ? "true" : "false"}
-                    onClick={() => setProfileOpen((v) => !v)}
+                    onClick={() => {
+                      setProfileOpen((v) => !v);
+                      setNotificationOpen(false);
+                    }}
                   >
                     <img
                       src={me?.user?.profilePicture || "/default.png"}
@@ -1123,7 +1230,7 @@ const MasterLayout = ({ children }) => {
           <div className="row align-items-center justify-content-between">
             <div className="col-auto">
               <p className="mb-0">
-                © {new Date().getFullYear()} Dotclick. All Rights Reserved.
+                © {new Date().getFullYear()} Mudeem. All Rights Reserved.
               </p>
             </div>
           </div>

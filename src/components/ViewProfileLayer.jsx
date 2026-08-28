@@ -68,7 +68,6 @@ const ViewProfileLayer = () => {
   const handleProfileSubmit = async (data) => {
     try {
       await updateProfile(data);
-      reset();
     } catch (err) {
       console.error("Update profile failed:", err);
     }
