@@ -16,10 +16,12 @@ const CategorySchema = z.object({
 const validateImage = (file) => {
   if (!file) return null;
 
-  const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
   const maxSize = 5 * 1024 * 1024; // 5MB
+  const isImage =
+    file.type?.startsWith("image/") ||
+    /\.(jpe?g|png|webp|svg)$/i.test(file.name || "");
 
-  if (!allowedTypes.includes(file.type)) return null;
+  if (!isImage) return null;
   if (file.size > maxSize) return null;
 
   return file;
@@ -30,6 +32,7 @@ const CategoryForm = ({ data }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
+  const inputId = `upload-category-image-${data?._id || "new"}`;
 
   const { createCategory, isPending } = useCreateCategory();
   const { updateCategory, updatePending } = useUpdateCategory();
@@ -116,7 +119,7 @@ const CategoryForm = ({ data }) => {
       <div className="row gy-3">
         {/* Image Upload */}
         <div className="col-12">
-          <label>Upload Banner Image (PNG, JPG, JPEG, max 5MB)</label>
+          <label>Upload Category Image (PNG, JPG, JPEG, max 5MB)</label>
 
           <div className="upload-image-wrapper d-flex align-items-center gap-3">
             {imagePreview ? (
@@ -140,7 +143,7 @@ const CategoryForm = ({ data }) => {
               </div>
             ) : (
               <label
-                htmlFor="upload-image"
+                htmlFor={inputId}
                 className="upload-file h-120-px w-120-px border radius-8 d-flex flex-column justify-content-center align-items-center cursor-pointer"
                 data-error={!imageFile ? "true" : "false"}
               >
@@ -150,10 +153,10 @@ const CategoryForm = ({ data }) => {
             )}
 
             <input
-              id="upload-image"
+              id={inputId}
               type="file"
               hidden
-              accept="image/png, image/jpeg, image/jpg, .png, .jpg, .jpeg"
+              accept="image/*, .png, .jpg, .jpeg, .webp"
               ref={fileInputRef}
               onChange={handleFileChange}
             />
