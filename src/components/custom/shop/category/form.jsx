@@ -16,7 +16,7 @@ const CategorySchema = z.object({
 const validateImage = (file) => {
   if (!file) return null;
 
-  const allowedTypes = ["image/png"];
+  const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
   const maxSize = 5 * 1024 * 1024; // 5MB
 
   if (!allowedTypes.includes(file.type)) return null;
@@ -116,7 +116,7 @@ const CategoryForm = ({ data }) => {
       <div className="row gy-3">
         {/* Image Upload */}
         <div className="col-12">
-          <label>Upload Banner Image (PNG only, max 5MB)</label>
+          <label>Upload Banner Image (PNG, JPG, JPEG, max 5MB)</label>
 
           <div className="upload-image-wrapper d-flex align-items-center gap-3">
             {imagePreview ? (
@@ -153,7 +153,7 @@ const CategoryForm = ({ data }) => {
               id="upload-image"
               type="file"
               hidden
-              accept="image/png"
+              accept="image/png, image/jpeg, image/jpg, .png, .jpg, .jpeg"
               ref={fileInputRef}
               onChange={handleFileChange}
             />
@@ -161,7 +161,7 @@ const CategoryForm = ({ data }) => {
 
           {!imageFile && (
             <p className="text-danger-500">
-              Invalid image (PNG only, max 5MB)
+              Invalid image (PNG, JPG, JPEG, max 5MB)
             </p>
           )}
         </div>

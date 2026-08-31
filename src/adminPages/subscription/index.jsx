@@ -66,7 +66,7 @@ const Subscription = () => {
       ],
     },
     {
-      type: "SustainaBuddy GPT",
+      type: "SustainBuddy GPT",
       price: 104.99,
       category: "Yearly",
       features: [
