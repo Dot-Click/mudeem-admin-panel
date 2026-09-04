@@ -23,18 +23,17 @@ const ForgotPasswordLayer = () => {
   } = useForm({
     resolver: zodResolver(ForgotPasswordSchema),
   });
-  const { isPending } = useForgotPassword();
+  const { forgotPassword, isPending } = useForgotPassword();
   const handleFormSubmit = async (data) => {
-    if (data?.email) {
-      try {
-        // const res = await forgotPassword(data);
-
-        // console.log(res);
-        // navigate("/dashboard");
-        navigate(`/reset-password/${data?.email}`);
-      } catch (err) {
-        console.error("Login failed:", err);
-      }
+    if (!data?.email) return;
+    try {
+      // Wait for the backend to confirm the email was actually sent. It fails
+      // when no account uses this address, so don't show the OTP screen for a
+      // code that will never arrive — the hook has already toasted the reason.
+      await forgotPassword({ email: data.email });
+      navigate(`/reset-password/${encodeURIComponent(data.email)}`);
+    } catch (err) {
+      console.error("Forgot password failed:", err);
     }
   };
   return (
